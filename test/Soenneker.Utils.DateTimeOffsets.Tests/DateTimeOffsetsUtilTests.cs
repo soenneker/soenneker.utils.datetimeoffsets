@@ -1,10 +1,9 @@
-﻿using Xunit;
 
 namespace Soenneker.Utils.DateTimeOffsets.Tests;
 
 public sealed class DateTimeOffsetsUtilTests
 {
-    [Fact]
+    [Test]
     public void Default()
     {
     }
