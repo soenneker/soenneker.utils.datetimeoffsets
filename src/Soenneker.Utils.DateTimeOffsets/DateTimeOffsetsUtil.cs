@@ -6,6 +6,9 @@ using System.Diagnostics.Contracts;
 
 namespace Soenneker.Utils.DateTimeOffsets;
 
+/// <summary>
+/// Represents the date time offsets util.
+/// </summary>
 public static class DateTimeOffsetsUtil
 {
     /// <summary>
