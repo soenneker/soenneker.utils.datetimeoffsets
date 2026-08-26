@@ -84,10 +84,10 @@ public static class DateTimeOffsetsUtil
     [Pure]
     public static List<(DateTimeOffset startAt, DateTimeOffset endAt)> GetWeeklyDateTimeOffsetsBetween(DateTimeOffset startAt, DateTimeOffset endAt, TimeZoneInfo timeZoneInfo)
     {
-        var result = new List<(DateTimeOffset startAt, DateTimeOffset endAt)>();
-
         DateTimeOffset startDate = startAt.ToStartOfTzWeek(timeZoneInfo);
         DateTimeOffset endDate = startDate.ToEndOfTzWeek(timeZoneInfo);
+        int capacity = endAt <= endDate ? 1 : 1 + (int)Math.Ceiling((endAt - endDate).TotalDays / 7d);
+        var result = new List<(DateTimeOffset startAt, DateTimeOffset endAt)>(capacity);
 
         result.Add((startDate, endDate));
 
@@ -117,10 +117,10 @@ public static class DateTimeOffsetsUtil
     [Pure]
     public static List<(DateTimeOffset startAt, DateTimeOffset endAt)> GetMonthlyDateTimeOffsetsBetween(DateTimeOffset startAt, DateTimeOffset endAt, TimeZoneInfo timeZoneInfo)
     {
-        var result = new List<(DateTimeOffset startAt, DateTimeOffset endAt)>();
-
         DateTimeOffset startDate = startAt.ToStartOfTzMonth(timeZoneInfo);
         DateTimeOffset endDate = startDate.ToEndOfTzMonth(timeZoneInfo);
+        int capacity = Math.Max(1, (endAt.Year - startDate.Year) * 12 + endAt.Month - startDate.Month + 1);
+        var result = new List<(DateTimeOffset startAt, DateTimeOffset endAt)>(capacity);
 
         result.Add((startDate, endDate));
 
