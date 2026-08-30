@@ -44,28 +44,28 @@ public static class DateTimeOffsetsUtil
 
     /// <summary>
     /// Builds a new <see cref="System.DateTimeOffset"/> instance representing a date and time 
-    /// adjusted to a specific time zone, with optional year, month, day, hour, minute, and second parameters.
-    /// If any parameter is not provided, the current UTC date and time values are used as defaults, 
-    /// and then converted to the specified time zone.
+    /// interpreted in a specific time zone, with optional year, month, day, hour, minute, and second parameters.
+    /// If any parameter is not provided, the current value in that time zone is used as its default.
     /// </summary>
     /// <remarks>
-    /// It leverages the <see cref="CreateUtcDateTimeOffset"/> method to create a UTC <see cref="System.DateTimeOffset"/> instance, which is
-    /// then adjusted to the specified time zone using the <see cref="TimeZoneInfo"/> parameter.
+    /// The supplied components represent wall-clock time in <paramref name="timeZoneInfo"/>. The returned value represents that instant with a zero UTC offset.
     /// </remarks>
     /// <param name="timeZoneInfo">The <see cref="TimeZoneInfo"/> representing the target time zone for the date and time.</param>
-    /// <param name="year">The year component of the date and time. Defaults to the current UTC year if null.</param>
-    /// <param name="month">The month component of the date and time. Defaults to the current UTC month if null.</param>
-    /// <param name="day">The day component of the date and time. Defaults to the current UTC day if null.</param>
-    /// <param name="hour">The hour component of the date and time. Defaults to the current UTC hour if null.</param>
-    /// <param name="minute">The minute component of the date and time. Defaults to the current UTC minute if null.</param>
-    /// <param name="second">The second component of the date and time. Defaults to the current UTC second if null.</param>
-    /// <returns>A <see cref="System.DateTimeOffset"/> object set to the specified date and time, adjusted to the specified time zone.</returns>
+    /// <param name="year">The year component, or the current year in the specified time zone.</param>
+    /// <param name="month">The month component, or the current month in the specified time zone.</param>
+    /// <param name="day">The day component, or the current day in the specified time zone.</param>
+    /// <param name="hour">The hour component, or the current hour in the specified time zone.</param>
+    /// <param name="minute">The minute component, or the current minute in the specified time zone.</param>
+    /// <param name="second">The second component, or the current second in the specified time zone.</param>
+    /// <returns>The UTC instant represented by the wall-clock components in <paramref name="timeZoneInfo"/>.</returns>
     [Pure]
     public static DateTimeOffset CreateTzDateTimeOffset(TimeZoneInfo timeZoneInfo, int? year = null, int? month = null, int? day = null, int? hour = null, int? minute = null, int? second = null)
     {
-        DateTimeOffset utcDateTimeOffset = CreateUtcDateTimeOffset(year, month, day, hour, minute, second);
-        DateTime localDateTime = new DateTime(utcDateTimeOffset.Year, utcDateTimeOffset.Month, utcDateTimeOffset.Day, utcDateTimeOffset.Hour, utcDateTimeOffset.Minute, utcDateTimeOffset.Second, DateTimeKind.Unspecified);
-        DateTime utcResult = TimeZoneInfo.ConvertTimeToUtc(localDateTime, timeZoneInfo);
+        DateTime now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZoneInfo);
+        var wallTime = new DateTime(year ?? now.Year, month ?? now.Month, day ?? now.Day, hour ?? now.Hour, minute ?? now.Minute,
+            second ?? now.Second, DateTimeKind.Unspecified);
+
+        DateTime utcResult = TimeZoneInfo.ConvertTimeToUtc(wallTime, timeZoneInfo);
         return new DateTimeOffset(utcResult, TimeSpan.Zero);
     }
 
@@ -93,8 +93,8 @@ public static class DateTimeOffsetsUtil
 
         while (endDate < endAt)
         {
-            startDate = startDate.AddDays(7);
-            endDate = endDate.AddDays(7);
+            startDate = startDate.ToStartOfNextTzWeek(timeZoneInfo);
+            endDate = startDate.ToEndOfTzWeek(timeZoneInfo);
 
             result.Add((startDate, endDate));
         }
@@ -126,8 +126,8 @@ public static class DateTimeOffsetsUtil
 
         while (endDate < endAt)
         {
-            startDate = startDate.AddMonths(1);
-            endDate = endDate.AddMonths(1);
+            startDate = startDate.ToStartOfNextTzMonth(timeZoneInfo);
+            endDate = startDate.ToEndOfTzMonth(timeZoneInfo);
 
             result.Add((startDate, endDate));
         }
