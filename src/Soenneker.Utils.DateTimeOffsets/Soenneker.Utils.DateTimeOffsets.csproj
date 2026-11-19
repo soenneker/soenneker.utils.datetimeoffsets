@@ -48,7 +48,7 @@
     <ItemGroup>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Soenneker.Extensions.DateTimeOffsets.Months" Version="11.0.184" />
-        <PackageReference Include="Soenneker.Extensions.DateTimeOffsets.Weeks" Version="11.0.176" />
+        <PackageReference Include="Soenneker.Extensions.DateTimeOffsets.Months" Version="11.0.185" />
+        <PackageReference Include="Soenneker.Extensions.DateTimeOffsets.Weeks" Version="11.0.177" />
     </ItemGroup>
 </Project>
